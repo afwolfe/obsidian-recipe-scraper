@@ -11,6 +11,25 @@ def get_recipe(url: str):
     return scraper
 
 
+def append_or_extend(list_to_add_to: list, to_add: str | list):
+    if to_add is not None:
+        list_to_add_to.extend(to_add if isinstance(to_add, list) else [to_add])
+
+
+def get_tags(recipe: AbstractScraper):
+    recipe_json = recipe.to_json()
+    tags = []
+    append_or_extend(tags, recipe_json.get("cookingMethod"))
+    append_or_extend(tags, recipe_json.get("recipeCategory"))
+    append_or_extend(tags, recipe_json.get("recipeCuisine"))
+    kw = recipe_json.get("keywords")
+    if kw is not None:
+        if isinstance(kw, str):
+            kw = kw.split(",")
+        append_or_extend(tags, kw)
+    return tags
+
+
 def recipe_to_obsidian_markdown(recipe: AbstractScraper):
     """
     Converts a recipe dictionary to an Obsidian Markdown file.
@@ -37,7 +56,10 @@ def recipe_to_obsidian_markdown(recipe: AbstractScraper):
     markdown_lines.append("---")
     markdown_lines.append("aliases:")
     markdown_lines.append(f"source: {recipe.url}")
-    # markdown_lines.append(f"tags: {','.join([t.replace(' ','-').lower() for t in recipe.keywords()])}")
+    tags = get_tags(recipe)
+    markdown_lines.append(
+        f"tags: {','.join([t.replace(' ', '-').lower() for t in tags])}"
+    )
     markdown_lines.append(f"rating: {recipe.ratings()}")
     markdown_lines.append("---")
 
