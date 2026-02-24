@@ -4,10 +4,9 @@ from recipe_scrapers import AbstractScraper, scrape_html
 
 
 def get_recipe(url: str):
-    html = urlopen(url).read().decode("utf-8")  # retrieves the recipe webpage HTML
+    html = urlopen(url).read().decode("utf-8")
     scraper = scrape_html(html, org_url=url)
 
-    # Extract recipe information
     return scraper
 
 
@@ -32,19 +31,10 @@ def get_tags(recipe: AbstractScraper):
 
 def recipe_to_obsidian_markdown(recipe: AbstractScraper):
     """
-    Converts a recipe dictionary to an Obsidian Markdown file.
+    Converts a scraped recipe to an Obsidian Markdown file.
 
     Args:
-        recipe_dict (dict): A recipe dictionary with the following keys:
-            cook_time (int): Estimated cooking time in minutes.
-            ingredients (list): List of recipe ingredients as strings.
-            name (str): The name of the recipe.
-            nb_servings (int): Estimated number of servings.
-            prep_time (int): Estimated preparation time in minutes.
-            rating (float): Average rating of the recipe (0-5).
-            steps (list): List of recipe steps as strings.
-            total_time (int): The total cooking time of the recipe.
-            url (str): The URL of the recipe.
+        recipe: AbstractScraper
 
     Returns:
         str: A Markdown string representing the recipe.
@@ -52,7 +42,7 @@ def recipe_to_obsidian_markdown(recipe: AbstractScraper):
 
     markdown_lines = []
 
-    # Add properties
+    # Add frontmatter
     markdown_lines.append("---")
     markdown_lines.append("aliases:")
     markdown_lines.append(f"source: {recipe.url}")
@@ -63,6 +53,7 @@ def recipe_to_obsidian_markdown(recipe: AbstractScraper):
     markdown_lines.append(f"rating: {recipe.ratings()}")
     markdown_lines.append("---")
 
+    # Heading and description
     markdown_lines.append(f"# {recipe.title()}\n")
     markdown_lines.append(recipe.description())
 
@@ -89,7 +80,6 @@ def recipe_to_obsidian_markdown(recipe: AbstractScraper):
 
 
 def write_recipe_to_file(recipe, outfile=None):
-    # md_lines = allrecipes_recipe_to_markdown(recipe)
     md_lines = recipe_to_obsidian_markdown(recipe)
     filename = outfile if outfile else f"{recipe.title()}.md"
     with open(filename, "w") as md_file:
