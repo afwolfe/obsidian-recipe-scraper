@@ -6,7 +6,7 @@ authors = [
     { name = "Alex Wolfe" }
 ]
 dependencies = [
-    "recipe_scrapers",
+    "recipemd-extract",
 ]
 requires-python = ">=3.13"
 
