@@ -46,7 +46,7 @@ def get_tags(recipe: SafeScraper):
         if isinstance(kw, str):
             kw = kw.split(",")
         append_or_extend(tags, kw)
-    return tags
+    return sorted(tags)
 
 
 def recipe_to_obsidian_markdown(recipe: SafeScraper):
@@ -68,9 +68,10 @@ def recipe_to_obsidian_markdown(recipe: SafeScraper):
     markdown_lines.append("aliases:")
     markdown_lines.append(f"source: {recipe.url}")
     tags = get_tags(recipe)
-    markdown_lines.append(
-        f"tags: {','.join([t.replace(' ', '-').lower() for t in tags])}"
-    )
+    if tags:
+        markdown_lines.append("tags:")
+        for t in tags:
+            markdown_lines.append(f"  - {t.replace(' ', '-').lower()}")
 
     rating = recipe.ratings()
     markdown_lines.append(f"rating: {rating}" if rating else None)
